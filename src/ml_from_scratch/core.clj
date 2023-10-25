@@ -34,7 +34,7 @@
   the prediction. This calcuation is done by multiplying each value
   in the sequences weights and merged bias, and then is summed up by
   the reducing function to emulate the function:
-  f(x,w) = w0 * x0 + w1 * x1 + ... + wn * xn
+  f(x,w) = w_0 * x_0 + w_1 * x_1 + ... + w_n * x_n
   "
   [weights inputs & unit]
   (let [merged-bias (vec (cons 1 inputs))]
@@ -50,9 +50,12 @@
   "l2 = 1/2 * ((prediction_0 - (weights_0 * basis(inputs_0))) + ...
                (prediction_n - (weights_n * basis(inputs_n))))^2 +
               (lambda / 2) * |weights|^reg-exponent"
-  [weights inputs prediction lambda reg-exponent]
-  (+ (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (basis-function inputs)))))) 2)
+  [weights inputs prediction lambda reg-exponent ^fn basis-fn]
+  (+ (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (apply basis-fn inputs)))))) 2)
      (ridge-regression lambda reg-exponent weights)))
+;; Needs to be updated so the first set of values is mapped over
+;; the result of ridge-regression
+
 
 (defn basis-function
   "The basis function is used for adjusting a line of best
@@ -78,8 +81,13 @@
   (lambda / 2) * |weights|^exponent"
   [lambda exponent weights]
   (map #(float (* (/ lambda 2) %)) (map #(reduce * (repeat exponent (abs %))) weights)))
+;; This function returns a list of the penalized weights.
+;; This is probably how it's supposed to be, though I'm not yet sure if I need
+;; to reduce it to one integer instead of a list.
 
-(defn find-lambda
-  "lambda = s0 / beta"
+(defn calculate-lambda
+  "lambda = s_0 / beta"
   []
   ())
+;; Still trying to understand what the significance of s_0 is
+;; Also trying to understand where beta comes from in the l2 equation.
