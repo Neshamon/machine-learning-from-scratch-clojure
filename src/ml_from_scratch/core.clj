@@ -46,7 +46,11 @@
 
 (basic-regression [34 0.39 0.33] [mother-height father-height] " cm") ;; => 159.4 cm
 
-(defn least-square-loss [weights inputs prediction lambda reg-exponent]
+(defn least-square-loss
+  "l2 = 1/2 * ((prediction_0 - (weights_0 * basis(inputs_0))) + ...
+               (prediction_n - (weights_n * basis(inputs_n))))^2 +
+              (lambda / 2) * |weights|^reg-exponent"
+  [weights inputs prediction lambda reg-exponent]
   (+ (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (basis-function inputs)))))) 2)
      (ridge-regression lambda reg-exponent weights)))
 
@@ -71,6 +75,11 @@
   the weights. The smaller lambda is, the lesser the penalty
 
   The original formula is:
-  (lambda / 2) * w^2"
+  (lambda / 2) * |weights|^exponent"
   [lambda exponent weights]
   (map #(float (* (/ lambda 2) %)) (map #(reduce * (repeat exponent (abs %))) weights)))
+
+(defn find-lambda
+  "lambda = s0 / beta"
+  []
+  ())
