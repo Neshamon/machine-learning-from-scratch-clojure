@@ -56,6 +56,20 @@
 
   Whatever the basis function may need to be depends on the
   context of the application. But when it is decided,
-  the fucntion is applied to each dimension of the inputs"
+  the function is applied to each dimension of the inputs"
   [input operation dimensions]
   ())
+
+(defn ridge-regression
+  "Ridge regression is a l2 norm regularization.
+  Regularization is when penalties are applied to the
+  parameters of a model.
+
+  With ridge regression, the larger lambda is the greater
+  the penalty is for the affected parameters, which would be
+  the weights. The smaller lambda is, the lesser the penalty
+
+  The original formula is:
+  (lambda / 2) * w^2"
+  [lambda weights]
+  (* (/ lambda 2)) (reduce + (map #(reduce * (repeat 2 %)) weights)))
