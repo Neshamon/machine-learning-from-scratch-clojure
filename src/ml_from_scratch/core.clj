@@ -34,7 +34,7 @@
   the prediction. This calcuation is done by multiplying each value
   in the sequences weights and merged bias, and then is summed up by
   the reducing function to emulate the function:
-  f(x,w) = w0 * x0 + w1 * x1 + ... wn * xn
+  f(x,w) = w0 * x0 + w1 * x1 + ... + wn * xn
   "
   [weights inputs & unit]
   (let [merged-bias (vec (cons 1 inputs))]
@@ -44,7 +44,10 @@
 
 (child-height-regression [34 0.39 0.33] [mother-height father-height]) ;; => 159.4 cm
 
-(basic-regression [34 0.39 0.33] [mother-height father-height]) ;; => 159.4 cm
+(basic-regression [34 0.39 0.33] [mother-height father-height] " cm") ;; => 159.4 cm
 
 (defn least-square-loss [weights inputs prediction]
-  (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights inputs))))) 2))
+  (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (basis-function inputs)))))) 2))
+
+(defn basis-function [input operation dimensions]
+  ())
