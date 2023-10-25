@@ -46,8 +46,9 @@
 
 (basic-regression [34 0.39 0.33] [mother-height father-height] " cm") ;; => 159.4 cm
 
-(defn least-square-loss [weights inputs prediction]
-  (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (basis-function inputs)))))) 2))
+(defn least-square-loss [weights inputs prediction lambda reg-exponent]
+  (+ (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (basis-function inputs)))))) 2)
+     (ridge-regression lambda reg-exponent weights)))
 
 (defn basis-function
   "The basis function is used for adjusting a line of best
@@ -71,5 +72,5 @@
 
   The original formula is:
   (lambda / 2) * w^2"
-  [lambda weights]
-  (* (/ lambda 2)) (reduce + (map #(reduce * (repeat 2 %)) weights)))
+  [lambda exponent weights]
+  (map #(float (* (/ lambda 2) %)) (map #(reduce * (repeat exponent (abs %))) weights)))
