@@ -49,5 +49,13 @@
 (defn least-square-loss [weights inputs prediction]
   (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (basis-function inputs)))))) 2))
 
-(defn basis-function [input operation dimensions]
+(defn basis-function
+  "The basis function is used for adjusting a line of best
+  fit to functions that may produce curves on a chart such
+  as sin, cos, log, and others.
+
+  Whatever the basis function may need to be depends on the
+  context of the application. But when it is decided,
+  the fucntion is applied to each dimension of the inputs"
+  [input operation dimensions]
   ())
