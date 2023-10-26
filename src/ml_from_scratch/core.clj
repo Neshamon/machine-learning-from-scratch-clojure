@@ -1,5 +1,14 @@
 (ns ml-from-scratch.core
-  (:gen-class))
+  (:gen-class)
+  (:refer-clojure
+   :exclude [+ - * / zero? compare divide numerator denominator
+             infinite? abs ref partial =])
+  (:require [emmy.clerk :as ec]
+            [emmy.env :as e :refer :all]
+            [emmy.mafs :as mafs]
+            [emmy.polynomial :as poly]
+            [emmy.viewer :as ev]
+            [nextjournal.clerk :as clerk]))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -18,6 +27,21 @@
   (apply str (concat (str (+ (first weights)
                              (* (second weights) (first parent-height))
                              (* (last weights) (last parent-height)))) " cm")))
+
+(mafs/mafs
+ {:height 300}
+ (mafs/cartesian)
+ (mafs/vector [1 2] {:color :blue}))
+
+(mafs/point-slope {:point [3 4]
+                   :slope 3/4
+                   :color :blue
+                   :opacity 1
+                   :weight 1})
+
+(mafs/of-x (basic-regression [34 0.39 0.33] [165 185]))
+
+(doc mafs/of-x)
 
 (defn basic-regression
   "This function is a more abstract version of child-height regression.
@@ -50,12 +74,22 @@
   "l2 = 1/2 * ((prediction_0 - (weights_0 * basis(inputs_0))) + ...
                (prediction_n - (weights_n * basis(inputs_n))))^2 +
               (lambda / 2) * |weights|^reg-exponent"
-  [weights inputs prediction lambda reg-exponent ^fn basis-fn]
-  (+ (/ (reduce + (reduce * (repeat 2 (- prediction (map #(* %1 %2) weights (apply basis-fn inputs)))))) 2)
+  [weights inputs prediction lambda reg-exponent basis-fn]
+  (+ (/ (reduce *
+                (repeat 2
+                        (- prediction
+                           (reduce + (map #(* %1 %2) weights (mapv basis-fn inputs)))))) 2)
      (ridge-regression lambda reg-exponent weights)))
 ;; Needs to be updated so the first set of values is mapped over
 ;; the result of ridge-regression
 
+(least-square-loss [34 0.39 0.33]
+                   [1 mother-height father-height]
+                   (basic-regression [34 0.39 0.33]
+                                     [mother-height father-height])
+                   1
+                   1
+                   #(if (number? %) %))
 
 (defn basis-function
   "The basis function is used for adjusting a line of best
@@ -80,7 +114,7 @@
   The original formula is:
   (lambda / 2) * |weights|^exponent"
   [lambda exponent weights]
-  (map #(float (* (/ lambda 2) %)) (map #(reduce * (repeat exponent (abs %))) weights)))
+  (reduce + (map #(float (* (/ lambda 2) %)) (map #(reduce * (repeat exponent (abs %))) weights))))
 ;; This function returns a list of the penalized weights.
 ;; This is probably how it's supposed to be, though I'm not yet sure if I need
 ;; to reduce it to one integer instead of a list.
@@ -91,3 +125,12 @@
   ())
 ;; Still trying to understand what the significance of s_0 is
 ;; Also trying to understand where beta comes from in the l2 equation.
+
+(defn start-clerk []
+  (ec/serve! {:browse true}))
+
+(defn stop-clerk []
+  (ec/halt!))
+
+(defn emmy-install []
+  (ec/install!))
